@@ -1,0 +1,12 @@
+{
+  "idopont": "2023-09-28T11:06:25Z",
+  "targy": "Szavazás tárgya",
+  "tipus": "j",
+  "eljaras": "n",
+  "elnok": "Kepviselo1",
+  "szavazatok": [
+    { "kepviselo": "Kepviselo1", "szavazat": "i" },
+    { "kepviselo": "Kepviselo2", "szavazat": "n" },
+    { "kepviselo": "Kepviselo3", "szavazat": "t" }
+  ]
+}

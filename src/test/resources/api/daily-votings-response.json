@@ -1,0 +1,32 @@
+{
+  "szavazasok": [
+    {
+      "idopont": "2023-12-13T14:30:00Z",
+      "targy": "Szavazás tárgya",
+      "tipus": "j",
+      "eljaras": "n",
+      "elnok": "Kepviselo1",
+      "eredmeny": "F",
+      "kepviselokSzama": 3,
+      "szavazatok": [
+        { "kepviselo": "Kepviselo1", "szavazat": "i" },
+        { "kepviselo": "Kepviselo2", "szavazat": "n" },
+        { "kepviselo": "Kepviselo3", "szavazat": "t" }
+      ]
+    },
+    {
+      "idopont": "2023-12-13T14:31:00Z",
+      "targy": "Szavazás tárgya",
+      "tipus": "m",
+      "eljaras": "n",
+      "elnok": "Kepviselo1",
+      "eredmeny": "U",
+      "kepviselokSzama": 3,
+      "szavazatok": [
+        { "kepviselo": "Kepviselo1", "szavazat": "i" },
+        { "kepviselo": "Kepviselo2", "szavazat": "n" },
+        { "kepviselo": "Kepviselo3", "szavazat": "t" }
+      ]
+    }
+  ]
+}

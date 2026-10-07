@@ -1,0 +1,13 @@
+{
+  "szavazasok": [
+    { "eljaras": "s", "eredmeny": "F", "szam": 2 },
+    { "eljaras": "s", "eredmeny": "U", "szam": 1 },
+    { "eljaras": "k", "eredmeny": "F", "szam": 1 },
+    { "eljaras": "k", "eredmeny": "U", "szam": 0 },
+    { "eljaras": "e", "eredmeny": "F", "szam": 0 },
+    { "eljaras": "e", "eredmeny": "U", "szam": 0 },
+    { "eljaras": "összes", "eredmeny": "F", "szam": 3 },
+    { "eljaras": "összes", "eredmeny": "U", "szam": 1 },
+    { "eljaras": "összes", "eredmeny": "összes", "szam": 4 }
+  ]
+}
