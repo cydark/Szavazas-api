@@ -1,0 +1,12 @@
+# csak a build kell a képbe: gradle wrapper, build-szkriptek, src
+.git/
+.gradle/
+.idea/
+.vscode/
+bin/
+build/
+out/
+data/
+docs/
+*.iml
+*.log

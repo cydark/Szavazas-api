@@ -1,0 +1,18 @@
+services:
+  voting-api:
+    # ugyanazt az image-et építi, mint a ./gradlew dockerBuild
+    image: voting-api:latest
+    build: .
+    ports:
+      # kifelé publikált port; ütközés esetén: VOTING_API_PORT=8081 docker compose up -d
+      - "${VOTING_API_PORT:-8080}:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      VOTING_TOTALMEMBERS: ${VOTING_TOTALMEMBERS:-200}
+    volumes:
+      - voting-api-data:/data
+
+volumes:
+  voting-api-data:
+    # rögzített név, a compose projektnév-előtagja nélkül (spec 3.5)
+    name: voting-api-data

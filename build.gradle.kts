@@ -41,6 +41,13 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+// ugyanazt az image-et építi a Dockerfile-ból, mint a compose (voting-api:latest)
+tasks.register<Exec>("dockerBuild") {
+    group = "build"
+    description = "Builds the voting-api:latest Docker image from the Dockerfile."
+    commandLine("docker", "build", "-t", "voting-api:latest", ".")
+}
+
 // a build elbukik formázatlan kódon (spotlessCheck a check része); javítás: ./gradlew spotlessApply
 spotless {
     java {
