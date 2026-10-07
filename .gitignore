@@ -1,0 +1,25 @@
+# Gradle és build-kimenet
+.gradle/
+build/
+bin/
+out/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+
+# futásidejű adatok (fájl alapú H2, naplók)
+data/
+*.db
+*.log
+
+# operációs rendszer
+.DS_Store
+Thumbs.db
