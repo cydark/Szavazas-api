@@ -1,12 +1,18 @@
 type,yesCount,presentCount,totalMembers,expected
+# jelenléti: mindig elfogadott, igen nélkül és üres teremben is
 PRESENCE,0,0,200,true
 PRESENCE,0,150,200,true
+# egyszerű többség, páros létszám: pontosan a fele (75/150) nem elég, eggyel több (76) igen
 SIMPLE_MAJORITY,76,150,200,true
 SIMPLE_MAJORITY,75,150,200,false
+# páratlan létszám (151): itt bukna el egy csonkoló osztás (151 / 2 = 75), az egész aritmetika (76 * 2 > 151) nem
 SIMPLE_MAJORITY,76,151,200,true
 SIMPLE_MAJORITY,75,151,200,false
+# senki nincs jelen: 0 * 2 > 0 hamis, nincs osztás nullával
 SIMPLE_MAJORITY,0,0,200,false
+# minősített többség: a teljes létszám a mérce, nem a jelenlévők (101/200 igen, 100/200 nem)
 QUALIFIED_MAJORITY,101,150,200,true
 QUALIFIED_MAJORITY,100,150,200,false
+# konfigurált, páratlan teljes létszám (199): 100 elég, 99 nem
 QUALIFIED_MAJORITY,100,199,199,true
 QUALIFIED_MAJORITY,99,199,199,false

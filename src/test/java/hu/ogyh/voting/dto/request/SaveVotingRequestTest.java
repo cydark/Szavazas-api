@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@DisplayName("Egység: a mentési kérés időpontja")
 class SaveVotingRequestTest {
 
     @Test

@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @DataJpaTest(properties = "spring.jpa.properties.hibernate.generate_statistics=true")
+@DisplayName("Repository: adatbázis-szintű garanciák")
 class VotingRepositoryTest {
 
     private static final Instant VOTED_TIME = Instant.parse("2023-12-13T14:30:00Z");

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
+@DisplayName("Egység: a többségi szabály (VotingType.isAccepted)")
 class VotingTypeTest {
 
     @DisplayName("A többségi szabály határesetei")

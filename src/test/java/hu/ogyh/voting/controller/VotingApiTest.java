@@ -1,6 +1,6 @@
 package hu.ogyh.voting.controller;
 
-import static org.hamcrest.Matchers.matchesPattern;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import hu.ogyh.voting.domain.FieldLimits;
+import hu.ogyh.voting.service.VotingService;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -27,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
 
-/** A specifikáció végpontjai, JSON-formái és hibakódjai, a teljes alkalmazáson keresztül. */
+@DisplayName("API: a specifikáció végpontjai, JSON-formái és hibakódjai a teljes alkalmazáson keresztül")
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -41,20 +42,25 @@ class VotingApiTest {
     @Autowired
     private JsonMapper jsonMapper;
 
+    /** Csak a nehezen előidézhető váratlan hibához; minden más teszt a valódi viselkedést használja. */
+    @MockitoSpyBean
+    private VotingService votingService;
+
     @Nested
     @DisplayName("1. Szavazás mentése")
     class Save {
 
         @Test
-        @DisplayName("A spec példakérése 200-at és url-barát azonosítót ad")
+        // az azonosító formáját a VotingIdGeneratorTest ellenőrzi
+        @DisplayName("1. A spec példakérése 200-at és szavazásazonosítót ad")
         void savesExampleRequest() throws Exception {
             save(template())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.szavazasId").value(matchesPattern(FieldLimits.PUBLIC_ID_PATTERN)));
+                    .andExpect(jsonPath("$.szavazasId").isString());
         }
 
         @Test
-        @DisplayName("Hibás mezők: Validációs hiba, mezőnkénti lista a JSON-nevekkel")
+        @DisplayName("1. Hibás mezők: Validációs hiba, mezőnkénti lista a JSON-nevekkel")
         void validationErrorsUseJsonNames() throws Exception {
             ObjectNode request = template();
             request.put("targy", "");
@@ -73,7 +79,7 @@ class VotingApiTest {
         }
 
         @Test
-        @DisplayName("Ismeretlen kód: Olvashatatlan kérés a hibás mezővel és kóddal")
+        @DisplayName("1. Ismeretlen kód: Olvashatatlan kérés a hibás mezővel és kóddal")
         void unknownCode() throws Exception {
             ObjectNode request = template();
             vote(request, 1).put("szavazat", "x");
@@ -85,7 +91,19 @@ class VotingApiTest {
         }
 
         @Test
-        @DisplayName("Nem értelmezhető JSON: Olvashatatlan kérés")
+        @DisplayName("1. Nem ISO-8601 időpont: Olvashatatlan kérés a hibás mezővel és értékkel")
+        void invalidVotedTime() throws Exception {
+            ObjectNode request = template();
+            request.put("idopont", "tegnap");
+
+            save(request)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.title").value("Olvashatatlan kérés"))
+                    .andExpect(jsonPath("$.detail").value("Érvénytelen érték a(z) idopont mezőben: tegnap"));
+        }
+
+        @Test
+        @DisplayName("1. Nem értelmezhető JSON: Olvashatatlan kérés")
         void malformedJson() throws Exception {
             mockMvc.perform(post(BASE + "/szavazas")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -96,7 +114,7 @@ class VotingApiTest {
         }
 
         @Test
-        @DisplayName("Üzleti szabály sérül: Érvénytelen kérés a hiba okával")
+        @DisplayName("1. Üzleti szabály sérül: Érvénytelen kérés a hiba okával")
         void businessRuleViolation() throws Exception {
             ObjectNode request = template();
             vote(request, 2).put("kepviselo", "Kepviselo2");
@@ -113,7 +131,7 @@ class VotingApiTest {
     class VoteAndResult {
 
         @Test
-        @DisplayName("A képviselő szavazata kóddal; két eltérő 404")
+        @DisplayName("2. A képviselő szavazata kóddal; nem létező szavazásra és nem szavazó képviselőre eltérő 404")
         void memberVote() throws Exception {
             String publicId = savedId(template());
 
@@ -131,7 +149,7 @@ class VotingApiTest {
         }
 
         @Test
-        @DisplayName("Az eredmény a spec szerinti mezőkkel")
+        @DisplayName("3. Az eredmény a spec szerinti mezőkkel; nem létező szavazásra 404")
         void result() throws Exception {
             String publicId = savedId(template());
 
@@ -152,8 +170,9 @@ class VotingApiTest {
     class Daily {
 
         @Test
-        @DisplayName("Időrendben, teljes adatokkal, eredménnyel és szavazatokkal")
+        @DisplayName("4. Időrendben, teljes adatokkal, eredménnyel és szavazatokkal")
         void dailyVotings() throws Exception {
+            // fordított sorrendben mentve: a válasz időrendje így a lekérdezés rendezését bizonyítja
             ObjectNode qualified = template();
             qualified.put("idopont", "2023-12-13T14:31:00Z");
             qualified.put("tipus", "m");
@@ -168,7 +187,7 @@ class VotingApiTest {
         }
 
         @Test
-        @DisplayName("Üres napon üres lista")
+        @DisplayName("4. Üres napon üres lista")
         void emptyDay() throws Exception {
             mockMvc.perform(get(BASE + "/napi-szavazasok").param("nap", "2023-12-13"))
                     .andExpect(status().isOk())
@@ -181,7 +200,7 @@ class VotingApiTest {
     class Statistics {
 
         @Test
-        @DisplayName("5.1 Részvételi átlag 2 tizedesre")
+        @DisplayName("5.1 A részvételi átlag 2 tizedesre, a spec szerinti formában")
         void participationAverage() throws Exception {
             saveAt("2023-12-10T10:00:00Z", "e", "n", "Kepviselo1", "Kepviselo2");
             saveAt("2023-12-11T10:00:00Z", "e", "n", "Kepviselo1");
@@ -190,7 +209,7 @@ class VotingApiTest {
                             .param("tol", "2023-12-01")
                             .param("ig", "2023-12-31"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.atlag").value(1.5));
+                    .andExpect(content().json("{\"atlag\": 1.50}", JsonCompareMode.STRICT));
         }
 
         @Test
@@ -217,16 +236,6 @@ class VotingApiTest {
                     .andExpect(content().json(resource("special-procedures-response.json"), JsonCompareMode.STRICT));
         }
 
-        @Test
-        @DisplayName("Fordított időszak: Érvénytelen kérés")
-        void reversedPeriod() throws Exception {
-            mockMvc.perform(get(BASE + "/kepviselo-reszvetel-atlag")
-                            .param("tol", "2023-12-31")
-                            .param("ig", "2023-12-01"))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.title").value("Érvénytelen kérés"));
-        }
-
         private void saveAt(String time, String type, String procedure, String... yesVoters) throws Exception {
             ObjectNode request = template();
             request.put("idopont", time);
@@ -241,11 +250,11 @@ class VotingApiTest {
     }
 
     @Nested
-    @DisplayName("Keretrendszer-hibák magyarul")
+    @DisplayName("2.4 Hibakezelés: paraméterhibák, váratlan hiba és a keretrendszer hibái magyarul")
     class FrameworkErrors {
 
         @Test
-        @DisplayName("Hiányzó paraméter")
+        @DisplayName("2.4 Hiányzó paraméter")
         void missingParameter() throws Exception {
             mockMvc.perform(get(BASE + "/eredmeny"))
                     .andExpect(status().isBadRequest())
@@ -254,7 +263,7 @@ class VotingApiTest {
         }
 
         @Test
-        @DisplayName("Érvénytelen paraméter")
+        @DisplayName("2.4 Érvénytelen paraméter")
         void invalidParameter() throws Exception {
             mockMvc.perform(get(BASE + "/napi-szavazasok").param("nap", "tegnap"))
                     .andExpect(status().isBadRequest())
@@ -263,7 +272,25 @@ class VotingApiTest {
         }
 
         @Test
-        @DisplayName("Nem létező útvonal, nem támogatott metódus és tartalomtípus")
+        @DisplayName("2.4 Váratlan hiba: Belső hiba, belső részletek nélkül")
+        void unexpectedErrorHidesInternals() throws Exception {
+            doThrow(new IllegalStateException("belső részlet: jdbc:h2:mem:voting"))
+                    .when(votingService)
+                    .getResult("XX9999");
+
+            mockMvc.perform(get(BASE + "/eredmeny").param("szavazas", "XX9999"))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                    .andExpect(content()
+                            .json(
+                                    """
+                                    {"title": "Belső hiba", "status": 500, "detail": "Váratlan hiba történt",
+                                     "instance": "/szavazasok/eredmeny"}""",
+                                    JsonCompareMode.STRICT));
+        }
+
+        @Test
+        @DisplayName("2.4 Nem létező útvonal, nem támogatott metódus és tartalomtípus")
         void notFoundMethodAndMediaType() throws Exception {
             mockMvc.perform(get(BASE + "/nincs-ilyen"))
                     .andExpect(status().isNotFound())

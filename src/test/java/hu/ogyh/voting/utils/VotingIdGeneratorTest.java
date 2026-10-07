@@ -6,6 +6,7 @@ import hu.ogyh.voting.domain.FieldLimits;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 
+@DisplayName("Egység: a szavazásazonosító formátuma")
 class VotingIdGeneratorTest {
 
     @RepeatedTest(100)
