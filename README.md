@@ -9,6 +9,17 @@ formájúak.
 - Java 21 (a Gradle wrapper a többit letölti)
 - Docker a konténeres futtatáshoz
 
+## Megjegyzés a feladatleíráshoz: az `eljaras` kötelező
+
+A feladatleírás a mentési kérés és a napi lista sémájában nem sorolja az `eljaras` mezőt a kötelezők
+közé, az 5.2 kimutatás válaszsémájában viszont kötelező. Az alkalmazás kötelezőként kezeli, mert:
+
+- eljárás nélkül egy szavazás nem sorolható sem normál, sem különleges eljárásba, így az 5.2
+  kimutatás nem lenne egyértelmű;
+- alapértéket a leírás nem ad meg, egy feltételezett érték pedig csendben torzíthatná a kimutatást.
+
+Hiányzó `eljaras` esetén a válasz `400 Validációs hiba`.
+
 ## Futtatás helyben
 
 ```bash
