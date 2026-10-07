@@ -19,6 +19,11 @@ repositories {
     mavenCentral()
 }
 
+// A Boot 4.1.1 által hozott H2 2.4.240 hibásan értékeli ki a CHECK megkötést, ha a táblát létrehozó
+// kapcsolat már lezárult (pl. a pool lecserélte) – minden mentés "Check constraint invalid" hibát ad.
+// A 2.5.252 javítja; eltávolítható, ha a Boot ennél újabb H2-t hoz.
+extra["h2.version"] = "2.5.252"
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
