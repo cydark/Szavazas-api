@@ -1,3 +1,30 @@
 spring:
   application:
     name: voting-api
+  datasource:
+    url: jdbc:h2:mem:voting;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  mvc:
+    format:
+      # minden LocalDate query-paraméter ISO formátumú (2023-12-13), paraméterenkénti @DateTimeFormat nélkül
+      date: iso
+  jpa:
+    open-in-view: false
+    hibernate:
+      # demó: a séma induláskor létrejön, leálláskor törlődik (élesben Flyway + validate, lásd spec 3.7)
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+
+voting:
+  # az Országgyűlés teljes létszáma (minősített többség); környezeti változóval: VOTING_TOTALMEMBERS
+  total-members: 200
+
+logging:
+  level:
+    org.hibernate.SQL: debug
